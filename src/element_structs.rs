@@ -51,7 +51,7 @@ impl<'a> ElementsResponse {
 #[derive(Deserialize)]
 pub struct AttributeResponse {
     #[serde(rename = "sessionId")]
-    session_id: String,
+    session_id: Option(String),
     pub value: String,
 }
 
