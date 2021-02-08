@@ -39,7 +39,7 @@ pub enum Selector {
     ID,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct ElementRequest {
     using: String,
     value: String,
@@ -199,13 +199,25 @@ impl WebDriver {
         let sess_id = self.session_id.clone().unwrap();
         let url = construct_url(vec!["session/", &(sess_id + "/"), "elements"]);
         let payload = ElementRequest::new(str_for_selector(selector), query.to_string());
-        let response: ElementsResponse = self.client
+        
+        // println!("url is {:?}", url);
+        // println!("payload is {:?}", payload);
+        // println!("selector is {:?}", str_for_selector(selector));
+        // println!("query is {:?}", query);
+        
+        let mut req_response: reqwest::Response = self.client
             .post(url)
             .json(&payload)
             .send()?
-            .error_for_status()?
+            .error_for_status()?;
+        // println!("req_response is {:?}", req_response.text());
+
+        let response: ElementsResponse = req_response
             .json()?;
-        let elements = response.parse_into_elements(&self.client);
+        // println!("response is {:?}", response);
+
+        let elements = response.parse_into_elements(&self.client, self.session_id.clone().unwrap());
+        // println!("elements is {:?}", elements);
         Ok(elements)
     }
 }
